@@ -136,15 +136,15 @@ void loop() {
       
       //for a vertical NICLA
       if (currentTime - lastAlertTime >= 1000){
-        if (abs(pitch) > ALERT_THRESHOLD+15 || (abs(roll) > 100.0 || abs(roll) < 80.0)) {
+        if (abs(pitch) > ALERT_THRESHOLD+1 || (abs(roll) > 100.0 || abs(roll) < 80.0)) {
           lastAlertTime = currentTime;
 
-          if (abs(pitch) > ALERT_THRESHOLD+15 && (abs(roll) > 100.0 || abs(roll) < 80.0)) {
-            snprintf(alertMessage, sizeof(alertMessage), "ALERT: Both side (%.1f°) and forward/backward (%.1f°) tilt exceed threshold", pitch, roll);
+          if (abs(pitch) > ALERT_THRESHOLD+1 && (abs(roll) > 100.0 || abs(roll) < 80.0)) {
+            snprintf(alertMessage, sizeof(alertMessage), "ALERT: Both side (%.1f°) and forward/backward (%.1f°) tilt exceed threshold", pitch, 90-roll);
           } else if (abs(pitch) > ALERT_THRESHOLD) {
             snprintf(alertMessage, sizeof(alertMessage), "ALERT: Side tilt (%.1f°) exceeds threshold", pitch);
           } else {
-            snprintf(alertMessage, sizeof(alertMessage), "ALERT: Forward/backward tilt (%.1f°) exceeds threshold", roll);  
+            snprintf(alertMessage, sizeof(alertMessage), "ALERT: Forward/backward tilt (%.1f°) exceeds threshold", 90-roll);  
           }
           alertCharacteristic.writeValue(alertMessage);
           Serial.println(alertMessage);

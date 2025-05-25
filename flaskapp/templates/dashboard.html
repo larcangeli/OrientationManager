@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Dashboard (Auto-Updating)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .alerts-wrapper { /* Added a wrapper for better structure */
+            min-height: 150px; /* Give some initial height */
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .alert-box {
+            border: 1px solid #ddd;
+            padding: 10px; /* Reduced padding a bit */
+            margin-bottom: 10px; /* Reduced margin a bit */
+            border-radius: 5px;
+            background-color: #e9efff;
+        }
+        .alert-box p {
+            margin: 0;
+            font-size: 1em; /* Adjusted font size */
+        }
+        .no-alerts {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            padding-top: 50px; /* Center "no alerts" if wrapper has min-height */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Latest Alerts</h1>
+        <div id="alerts-container" class="alerts-wrapper">
+            <!-- Alerts will be populated here by JavaScript -->
+            <p class="no-alerts">Loading alerts...</p>
+        </div>
+    </div>
+
+    <script>
+        const alertsContainer = document.getElementById('alerts-container');
+        const pollingInterval = 3000; // Fetch new data every 3 seconds (3000 milliseconds)
+
+        async function fetchAndUpdateAlerts() {
+            console.log("Fetching alerts...");
+            try {
+                const response = await fetch('/get_alerts_data');
+                if (!response.ok) {
+                    console.error("Error fetching alerts: ", response.status, response.statusText);
+                    alertsContainer.innerHTML = '<p class="no-alerts">Error loading alerts. Check console.</p>';
+                    return;
+                }
+                const data = await response.json();
+
+                // Clear previous alerts
+                alertsContainer.innerHTML = '';
+
+                if (data.alerts && data.alerts.length > 0) {
+                    data.alerts.forEach(alertText => {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert-box';
+
+                        const p = document.createElement('p');
+                        p.textContent = alertText;
+
+                        alertDiv.appendChild(p);
+                        alertsContainer.appendChild(alertDiv);
+                    });
+                } else {
+                    alertsContainer.innerHTML = '<p class="no-alerts">No alerts received yet.</p>';
+                }
+            } catch (error) {
+                console.error("Failed to fetch or process alerts:", error);
+                alertsContainer.innerHTML = '<p class="no-alerts">Could not connect to server or error processing data.</p>';
+            }
+        }
+
+        // Fetch alerts when the page loads
+        window.onload = fetchAndUpdateAlerts;
+
+        // Set up polling to fetch alerts periodically
+        setInterval(fetchAndUpdateAlerts, pollingInterval);
+    </script>
+</body>
+</html>

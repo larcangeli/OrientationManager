@@ -28,4 +28,7 @@ Thumbs.db
 # Secrets
 src/token.json  # <--- ADD THIS LINE or just token.json if it's in root
 src/credentials.json # <--- ALSO ADD THIS! credentials.json is also a secret.
+flaskapp/token.json
+flaskapp/credentials.json
+
 # ... other OS specific files etc ...
