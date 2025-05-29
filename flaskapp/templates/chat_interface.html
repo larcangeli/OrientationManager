@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PosturAI Chat</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
+        #chatbox { width: 80%; max-width: 600px; margin: auto; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); padding: 20px; }
+        .message { margin-bottom: 15px; padding: 10px; border-radius: 5px; }
+        .user-message { background-color: #e1f5fe; text-align: right; margin-left: auto; max-width: 70%; }
+        .ai-message { background-color: #f0f0f0; text-align: left; margin-right: auto; max-width: 70%; }
+        #userInput { width: calc(100% - 70px); padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        #sendButton { width: 60px; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #sendButton:hover { background-color: #0056b3; }
+        #messages { max-height: 400px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; padding:10px;}
+    </style>
+</head>
+<body>
+    <div id="chatbox">
+        <h2>Parla con PosturAI</h2>
+        <div id="messages">
+            <div class="ai-message">Ciao! Sono PosturAI. Come posso aiutarti oggi con la tua postura?</div>
+        </div>
+        <div>
+            <input type="text" id="userInput" placeholder="Scrivi la tua domanda...">
+            <button id="sendButton">Invia</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        async function sendMessage() {
+            const question = userInput.value.trim();
+            if (!question) return;
+
+            appendMessage(question, 'user');
+            userInput.value = ''; // Clear input
+
+            try {
+                const response = await fetch('/chat_ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                appendMessage(data.reply, 'ai');
+
+            } catch (error) {
+                console.error('Errore:', error);
+                appendMessage('Scusa, c\'è stato un errore di connessione. Riprova.', 'ai');
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender + '-message');
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -30,5 +30,6 @@ src/token.json  # <--- ADD THIS LINE or just token.json if it's in root
 src/credentials.json # <--- ALSO ADD THIS! credentials.json is also a secret.
 flaskapp/token.json
 flaskapp/credentials.json
+flaskapp/google_API_key.txt
 
 # ... other OS specific files etc ...

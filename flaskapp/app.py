@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import datetime
 import os
+import google.generativeai as genai
 import time # For sleeping in the background thread
 import threading # For background tasks
 from collections import deque
@@ -18,10 +19,48 @@ GOOGLE_DRIVE_CSV_FOLDER_ID = "1eT3I5RGrzFJRERu72Lw-N6YjeNgyzUD2"
 LOCAL_DOWNLOAD_DIR = "downloaded_csvs"
 MAX_MESSAGES = 3
 received_alerts = deque(maxlen=MAX_MESSAGES)
+API_KEY_FILE_PATH = "google_API_key.txt" # Path to your Google API key file
+# Load Google API key from file
+GOOGLE_API_KEY = None
+try:
+    with open(API_KEY_FILE_PATH, 'r') as f:
+        # Leggi la chiave, rimuovendo eventuali spazi bianchi o a capo
+        # Se hai più chiavi nel file, dovrai gestirlo diversamente
+        raw_key = f.read().strip()
+        if raw_key: #file not empty
+            GOOGLE_API_KEY = raw_key
+        else:
+            print(f"ATTENZIONE: Il file della API key '{API_KEY_FILE_PATH}' è vuoto.")
+except FileNotFoundError:
+    print(f"ATTENZIONE: File della API key '{API_KEY_FILE_PATH}' non trovato.")
+except Exception as e:
+    print(f"ATTENZIONE: Errore durante la lettura del file API key '{API_KEY_FILE_PATH}': {e}")
+
+# Initialize Google Generative AI client if API key is available
+if GOOGLE_API_KEY:
+    genai.configure(api_key=GOOGLE_API_KEY)
+    model_gemini = genai.GenerativeModel('gemini-2.0-flash') 
+else:
+    print("ATTENZIONE: La variabile d'ambiente GOOGLE_API_KEY non è impostata.")
+    model_gemini = None 
+
 
 # Configuration for background task
-DRIVE_FETCH_INTERVAL_SECONDS = 20 # Fetch every 5 minutes (300 seconds)
-background_thread_stop_event = threading.Event() # To signal the thread to stop
+DRIVE_FETCH_INTERVAL_SECONDS = 20 
+background_thread_stop_event = threading.Event() 
+
+# Funzione placeholder, da sostituire con la tua vera analisi CSV
+def get_posture_summary_for_llm(user_id="default_user"):
+    # QUI VA LA LOGICA DI LETTURA E ANALISI CSV
+    # Esempio:
+    # posture_data_summary = posture_analyzer.summarize_csv_data_for_user(user_id, days_to_analyze=7)
+    # return posture_data_summary
+    return """Analisi posturale per l'utente StudenteX dal 20/05/2025 al 26/05/2025:
+    - Tempo totale di monitoraggio: 25 ore.
+    - Inclinazione eccessiva in avanti (pitch > 20°): rilevata per il 60% del tempo, principalmente nelle ore pomeridiane (14:00-18:00) durante le sessioni di studio.
+    - Inclinazione laterale a sinistra (roll < -15°): rilevata per il 15% del tempo, spesso quando l'utente scrive o usa il mouse.
+    - Rispetto alla settimana precedente, l'inclinazione in avanti è leggermente aumentata."""
+
 
 # --- Google Drive Fetching Logic (moved to a function) ---
 def perform_drive_csv_fetch():
@@ -110,11 +149,15 @@ def receive_alert_post():
             logger.error(f"Error processing /alert POST request: {e}", exc_info=True)
             return jsonify({"status": "error", "message": str(e)}), 500
 
-
+'''
 @app.route('/', methods=['GET'])
 def dashboard_page():
     logger.info("Dashboard page requested.")
     return render_template('dashboard.html')
+'''
+@app.route('/')
+def index():
+    return render_template('chat_interface.html')
 
 
 @app.route('/get_alerts_data', methods=['GET'])
@@ -128,6 +171,56 @@ def fetch_drive_csvs_route_manual():
     logger.info("Manual request received to fetch CSVs from Google Drive.")
     result = perform_drive_csv_fetch() # Call the refactored function
     return jsonify(result), 200 if result.get("status") == "success" else 500
+
+@app.route('/chat_ai', methods=['POST'])
+def chat_ai_endpoint():
+    data = request.get_json()
+    user_question = data.get('question')
+
+    if not user_question:
+        return jsonify({"error": "Domanda non fornita"}), 400
+
+    # 1. Ottieni il riassunto dei dati posturali
+    posture_context = get_posture_summary_for_llm() # In futuro, passerai un user_id
+
+    # 2. Costruisci il Prompt per l'LLM
+    system_prompt = """Tu sei PosturAI, un consulente AI amichevole e esperto di ergonomia, specializzato nell'aiutare gli studenti a migliorare la loro postura.
+    Il tuo obiettivo è analizzare i dati posturali forniti, rispondere alle domande degli studenti, offrire consigli pratici e incoraggianti.
+    Non fornire diagnosi mediche. Concentrati su abitudini, esercizi semplici e setup della postazione di studio.
+    Sii conciso ma informativo."""
+
+    # Prompt per l'utente (combinando contesto e domanda)
+    # Per Gemini (che preferisce un formato di prompt più diretto o una storia di chat)
+    # Puoi anche usare una struttura di chat con turni 'user' e 'model' se l'API lo supporta meglio
+    full_prompt = f"""Contesto dei dati posturali dello studente:
+    {posture_context}
+
+    Domanda dello studente:
+    {user_question}
+
+    Tua risposta come PosturAI:"""
+
+    # 3. Chiama l'API dell'LLM
+    try:
+        # Esempio con Google Gemini
+        response = model_gemini.generate_content(full_prompt)
+        ai_reply = response.text
+
+        # Esempio con OpenAI (se si usa client_openai)
+        # chat_completion = client_openai.chat.completions.create(
+        #     messages=[
+        #         {"role": "system", "content": system_prompt},
+        #         {"role": "user", "content": f"Contesto: {posture_context}\n\nDomanda: {user_question}"}
+        #     ],
+        #     model="gpt-3.5-turbo",
+        # )
+        # ai_reply = chat_completion.choices[0].message.content
+
+    except Exception as e:
+        print(f"Errore durante la chiamata all'LLM: {e}")
+        ai_reply = "Scusa, sto avendo qualche difficoltà a elaborare la tua richiesta in questo momento. Riprova più tardi."
+
+    return jsonify({"reply": ai_reply})
 
 
 # --- Main Execution ---
