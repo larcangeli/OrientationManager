@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import datetime
 import os
+from flask_cors import CORS # For handling CORS if needed
 import google.generativeai as genai
 import time # For sleeping in the background thread
 import threading # For background tasks
@@ -13,6 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes (optional, adjust as needed)
 
 # --- Configuration ---
 GOOGLE_DRIVE_CSV_FOLDER_ID = "1eT3I5RGrzFJRERu72Lw-N6YjeNgyzUD2"
@@ -154,11 +156,11 @@ def receive_alert_post():
 def dashboard_page():
     logger.info("Dashboard page requested.")
     return render_template('dashboard.html')
-'''
+
 @app.route('/')
 def index():
     return render_template('chat_interface.html')
-
+'''
 
 @app.route('/get_alerts_data', methods=['GET'])
 def get_alerts_data_json():
