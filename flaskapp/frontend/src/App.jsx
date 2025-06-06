@@ -56,7 +56,7 @@ function App() {
   return (
     <div className="page-wrapper-with-background"> {/* For the overall page background */}
       <header className="app-header-simple"> {/* Optional: A simple header */}
-        <h1>PosturAI Chat</h1>
+        <h1>Posture Manager</h1>
       </header>
 
       <div className="main-layout-container"> {/* This will be our flex container */}
