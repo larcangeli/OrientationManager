@@ -52,10 +52,11 @@ body {
 }
 
 .left-content-area {
-  flex-basis: 60%; /* Adjust as needed, e.g., 280px for a fixed sidebar */
+  flex-basis: 400px; /* Adjust as needed, e.g., 280px for a fixed sidebar */
   /*fixed left sidebar that doesn't shrink*/
-  /*width: 280px;*/
+  width: 400px;
   flex-shrink: 0;
+  flex-grow: 0;
 
   background-color: #f4f6f6;
   padding: 20px; /* Padding specific to the content of the left area */
@@ -74,6 +75,15 @@ body {
   display: flex; /* To allow chat-container to fill it */
   min-width: 0; /* Important for flex items that might contain long content, prevents overflow */
 }
+
+/* Statistics area - same flex properties as chat area */
+.statistics-area {
+  flex-grow: 1; /* Takes remaining horizontal space */
+  display: flex;
+  min-width: 0; /* Important for flex items */
+  overflow: hidden; /* Prevent overflow */
+}
+
 
 .chat-container {
   width: 100%;
@@ -210,3 +220,89 @@ body {
   flex-shrink: 0;
 }
 */
+
+/* ... existing styles ... */
+
+.nav-menu {
+  margin-bottom: 30px;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  font-size: 0.95em;
+}
+
+.nav-button:hover {
+  background-color: #e3f2fd;
+  border-color: #2E86C1;
+}
+
+.nav-button.active {
+  background-color: #2E86C1;
+  color: white;
+  border-color: #2E86C1;
+}
+
+.nav-icon {
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+.user-info {
+  background-color: #e8f4f8;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.user-info h3 {
+  margin: 0 0 15px 0;
+  color: #2E86C1;
+  font-size: 1em;
+}
+
+.quick-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.quick-stat:last-child {
+  margin-bottom: 0;
+}
+
+.quick-stat .stat-value {
+  font-weight: bold;
+}
+
+.quick-stat .stat-value.good {
+  color: #28a745;
+}
+
+.quick-stat .stat-value.alert {
+  color: #dc3545;
+}
+
+/* Update main layout for statistics page */
+.main-layout-container.full-width {
+  padding: 20px 0;
+}
+
+.main-layout-container.full-width .left-content-area {
+  flex-basis: 250px;
+  flex-shrink: 0;
+}
+
+/* ... rest of existing styles ... */

@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css'; // We'll heavily modify this
+import Statistics from './Statistics';
+import './App.css';
 
-// Assume FLASK_BACKEND_URL is still relevant if you're calling an API for the chat
 const FLASK_BACKEND_URL = 'http://localhost:5000';
 
 function App() {
-  // --- Chat State and Logic (Keep this as it was) ---
+  // Add state for page navigation
+  const [currentPage, setCurrentPage] = useState('chat');
+  
+  // --- Chat State and Logic ---
   const [messageInput, setMessageInput] = useState('');
   const [messageList, setMessageList] = useState([
     { id: 1, text: "Hi! I'm PosturAI. How can I help you with your posture today?", sender: "ai" }
@@ -51,64 +54,96 @@ function App() {
       setMessageList(prevMessages => [...prevMessages, errorMessageForAI]);
     }
   };
-  // --- End Chat State and Logic ---
+
+  const renderCurrentPage = () => {
+    switch(currentPage) {
+      case 'statistics':
+        return <Statistics />;
+      case 'chat':
+      default:
+        return (
+          <main className="right-chat-area">
+            <div className="chat-container">
+              <div className="chat-header">
+                <h2>Chat with PosturAI</h2>
+              </div>
+              <div className="messages-list">
+                {messageList.map(msg => (
+                  <div key={msg.id} className={`message ${msg.sender === 'user' ? 'user-message' : 'ai-message'}`}>
+                    {msg.text}
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="message ai-message loading-message">
+                    <em>PosturAI is thinking...</em>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+              <div className="input-area">
+                <input
+                  type="text"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
+                  placeholder="Ask me about posture..."
+                  disabled={isLoading}
+                />
+                <button onClick={handleSendMessage} disabled={isLoading}>
+                  {isLoading ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+          </main>
+        );
+    }
+  };
 
   return (
-    <div className="page-wrapper-with-background"> {/* For the overall page background */}
-      <header className="app-header-simple"> {/* Optional: A simple header */}
+    <div className="page-wrapper-with-background">
+      <header className="app-header-simple">
         <h1>Posture Manager</h1>
       </header>
 
-      <div className="main-layout-container"> {/* This will be our flex container */}
+      <div className="main-layout-container">
         <aside className="left-content-area">
-          <h2>Left Area</h2>
-          <p>This space can be used for other components, navigation, or information later.</p>
-          {/* Example: You could later import and place components here like:
-            <UserProfile />
-            <QuickLinks />
-          */}
-        </aside>
-
-        <main className="right-chat-area">
-          {/* The existing chat-container and its content go here */}
-          <div className="chat-container">
-            <div className="chat-header"> {/* Re-using chat-header style for consistency */}
-              <h2>Chat with PosturAI</h2>
+          <h2>Navigation</h2>
+          <div className="nav-menu">
+            <button 
+              className={`nav-button ${currentPage === 'chat' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('chat')}
+            >
+              <span className="nav-icon">💬</span>
+              Chat with PosturAI
+            </button>
+            <button 
+              className={`nav-button ${currentPage === 'statistics' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('statistics')}
+            >
+              <span className="nav-icon">📊</span>
+              Statistics & Graphs
+            </button>
+          </div>
+          
+          <div className="user-info">
+            <h3>Quick Stats</h3>
+            <div className="quick-stat">
+              <span>Today's Monitoring:</span>
+              <span className="stat-value">4.2h</span>
             </div>
-            <div className="messages-list">
-              {messageList.map(msg => (
-                <div key={msg.id} className={`message ${msg.sender === 'user' ? 'user-message' : 'ai-message'}`}>
-                  {msg.text}
-                </div>
-              ))}
-              {isLoading && (
-                <div className="message ai-message loading-message">
-                  <em>PosturAI is thinking...</em>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+            <div className="quick-stat">
+              <span>Good Posture:</span>
+              <span className="stat-value good">78%</span>
             </div>
-            <div className="input-area">
-              <input
-                type="text"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
-                placeholder="Ask me about posture..."
-                disabled={isLoading}
-              />
-              <button onClick={handleSendMessage} disabled={isLoading}>
-                {isLoading ? 'Sending...' : 'Send'}
-              </button>
+            <div className="quick-stat">
+              <span>Alerts Today:</span>
+              <span className="stat-value alert">12</span>
             </div>
           </div>
-        </main>
+        </aside>
+
+        {currentPage === 'statistics' ? <Statistics /> : renderCurrentPage()}
       </div>
-      {/* Optional: A simple footer
-      <footer className="app-footer-simple">
-        <p>&copy; {new Date().getFullYear()} PosturAI. User: {larcangeli}</p>
-      </footer>
-      */}
     </div>
   );
 }

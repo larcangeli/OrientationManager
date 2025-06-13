@@ -1,0 +1,258 @@
+.statistics-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.stats-header h1 {
+  color: #2E86C1;
+  margin: 0;
+}
+
+.time-range-selector select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-value.good {
+  color: #28a745;
+}
+
+.stat-value.warning {
+  color: #ffc107;
+}
+
+.stat-value.alert {
+  color: #dc3545;
+}
+
+.chart-container {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.chart-container h3 {
+  margin-top: 0;
+  color: #2E86C1;
+  text-align: center;
+}
+
+.simple-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.chart-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+}
+
+.bar {
+  width: 15px;
+  margin: 0 2px;
+  min-height: 5px;
+  border-radius: 3px 3px 0 0;
+}
+
+.bar.good-posture {
+  background-color: #28a745;
+}
+
+.bar.poor-posture {
+  background-color: #dc3545;
+}
+
+.bar-label {
+  font-size: 0.8em;
+  margin-top: 10px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  color: #666;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-color.good {
+  background-color: #28a745;
+}
+
+.legend-color.poor {
+  background-color: #dc3545;
+}
+
+.alert-frequency {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.alert-frequency h3 {
+  margin-top: 0;
+  color: #2E86C1;
+  text-align: center;
+}
+
+.frequency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.frequency-item {
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.frequency-date {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.frequency-count {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.frequency-bar {
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.frequency-fill {
+  height: 100%;
+  background-color: #ffc107;
+  transition: width 0.3s ease;
+}
+
+.insights-section {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.insights-section h3 {
+  margin-top: 0;
+  color: #2E86C1;
+}
+
+.insights-content ul {
+  line-height: 1.6;
+  color: #555;
+}
+
+.ai-analysis-btn {
+  background-color: #2E86C1;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.ai-analysis-btn:hover {
+  background-color: #1f5f84;
+}
+
+@media (max-width: 768px) {
+  .stats-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .simple-chart {
+    padding: 0 10px;
+  }
+  
+  .chart-bar {
+    width: 30px;
+  }
+}

@@ -7,6 +7,10 @@ import time # For sleeping in the background thread
 import threading # For background tasks
 from collections import deque
 import logging
+import json
+import pandas as pd
+from datetime import datetime, timedelta
+import glob
 
 import google_drive_utils as drive_utils # Your Google Drive utility module
 
@@ -130,6 +134,68 @@ def background_drive_fetcher():
             perform_drive_csv_fetch()
     logger.info("Background Drive Fetcher thread stopped.")
 
+def generate_mock_posture_data(days):
+    """
+    Generate mock data for testing. Replace this with real CSV analysis.
+    """
+    daily_data = []
+    total_alerts = 0
+    total_hours = 0
+    
+    for i in range(days):
+        date = (datetime.now() - timedelta(days=days-i-1)).strftime('%m/%d')
+        good_posture = 60 + (i * 2) + (i % 3) * 10  # Varies between 60-90%
+        poor_posture = 100 - good_posture
+        alert_count = 5 + (i % 4) * 3  # Varies between 5-17 alerts
+        hours = 4 + (i % 3) * 1.5  # Varies between 4-7 hours
+        
+        daily_data.append({
+            'date': date,
+            'good_posture_percentage': good_posture,
+            'poor_posture_percentage': poor_posture,
+            'alert_count': alert_count,
+            'hours_monitored': hours
+        })
+        
+        total_alerts += alert_count
+        total_hours += hours
+    
+    summary = {
+        'total_hours': round(total_hours, 1),
+        'good_posture_percentage': round(sum(d['good_posture_percentage'] for d in daily_data) / len(daily_data), 1),
+        'forward_lean_percentage': 25,  # Mock data
+        'side_tilt_percentage': 15,     # Mock data
+        'total_alerts': total_alerts
+    }
+    
+    return {
+        'daily_data': daily_data,
+        'summary': summary
+    }
+
+def analyze_csv_data_for_stats(days=7):
+    """
+    Analyze actual CSV files from your posture data.
+    This function should be implemented to read your CSV files and calculate real statistics.
+    """
+    # TODO: Implement real CSV analysis
+    # 1. Read CSV files from LOCAL_DOWNLOAD_DIR
+    # 2. Filter data for the last 'days' days
+    # 3. Calculate posture statistics (pitch/roll thresholds)
+    # 4. Count alerts and monitoring time
+    # 5. Return structured data for frontend
+    
+    csv_files = glob.glob(os.path.join(LOCAL_DOWNLOAD_DIR, "*.csv"))
+    
+    # Example structure for real implementation:
+    # for csv_file in csv_files:
+    #     df = pd.read_csv(csv_file)
+    #     # Analyze pitch, roll, yaw data
+    #     # Calculate time periods with good vs poor posture
+    #     # Count alerts based on your thresholds
+    
+    pass
+
 
 # --- Flask Routes (Alerts, Dashboard, etc. remain the same) ---
 @app.route('/alert', methods=['POST'])
@@ -223,6 +289,26 @@ def chat_ai_endpoint():
         ai_reply = "Scusa, sto avendo qualche difficoltà a elaborare la tua richiesta in questo momento. Riprova più tardi."
 
     return jsonify({"reply": ai_reply})
+
+
+@app.route('/api/posture-stats')
+def get_posture_statistics():
+    """
+    API endpoint to get posture statistics for the frontend graphs
+    """
+    try:
+        days = int(request.args.get('days', 7))
+        
+        # This is where you'll implement your CSV analysis logic
+        # For now, returning mock data structure
+        mock_data = generate_mock_posture_data(days)
+        
+        return jsonify(mock_data)
+    
+    except Exception as e:
+        print(f"Error getting posture statistics: {e}")
+        return jsonify({"error": "Failed to fetch statistics"}), 500
+
 
 
 # --- Main Execution ---
