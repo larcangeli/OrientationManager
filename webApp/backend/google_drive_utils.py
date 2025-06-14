@@ -16,8 +16,8 @@ SCOPES = [
     # If you also need to delete files from Drive after download, add:
     # 'https://www.googleapis.com/auth/drive.file'
 ]
-CREDENTIALS_FILE = 'credentials.json'
-TOKEN_FILE = 'token.json'
+CREDENTIALS_FILE = '../../config/credentials.json'
+TOKEN_FILE = '../../config/token.json'
 
 # Setup basic logging for this module
 logger = logging.getLogger(__name__)

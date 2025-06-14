@@ -4,6 +4,8 @@
   margin: 0 auto;
   background-color: #f8f9fa;
   min-height: 100vh;
+  min-width: 77%;
+  border-radius: 8px;
 }
 
 .stats-header {

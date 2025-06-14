@@ -26,10 +26,11 @@ Thumbs.db
 .venv/
 .vscode/ # Or be selective
 # Secrets
-src/token.json
-src/credentials.json 
-flaskapp/token.json
-flaskapp/credentials.json
-flaskapp/google_API_key.txt
+config/token.json
+config/credentials.json 
+config/google_API_key.txt
+
+# csv files
+webApp/backend/downloaded_csvs/.*csv
 
 # ... other OS specific files etc ...

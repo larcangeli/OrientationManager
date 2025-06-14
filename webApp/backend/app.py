@@ -11,7 +11,7 @@ import json
 import pandas as pd
 from datetime import datetime, timedelta
 import glob
-
+import sys
 import google_drive_utils as drive_utils # Your Google Drive utility module
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -25,7 +25,8 @@ GOOGLE_DRIVE_CSV_FOLDER_ID = "1eT3I5RGrzFJRERu72Lw-N6YjeNgyzUD2"
 LOCAL_DOWNLOAD_DIR = "downloaded_csvs"
 MAX_MESSAGES = 3
 received_alerts = deque(maxlen=MAX_MESSAGES)
-API_KEY_FILE_PATH = "google_API_key.txt" # Path to your Google API key file
+API_KEY_FILE_PATH = "../../config/google_API_key.txt"
+
 # Load Google API key from file
 GOOGLE_API_KEY = None
 try:

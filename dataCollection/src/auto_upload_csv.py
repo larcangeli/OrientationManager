@@ -12,14 +12,12 @@ from googleapiclient.http import MediaFileUpload
 
 # --- CONFIGURATION ---
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/drive.file'] # Scope for creating files
-LOCAL_DIR_TO_WATCH = r"C:\Users\kronr\Documents\PlatformIO\Projects\OrientationManager\src"  # Raw string for Windows paths
-DRIVE_FOLDER_ID = "1eT3I5RGrzFJRERu72Lw-N6YjeNgyzUD2" # ID of the folder in GDrive where files will be uploaded
-# the ID is the last part of the folder URL in drive (e.g., .../folders/THIS_IS_THE_ID)
-# If you want to upload to the root of "My Drive", set DRIVE_FOLDER_ID = None or DRIVE_FOLDER_ID = "root"
+SCOPES = ['https://www.googleapis.com/auth/drive.file'] 
+LOCAL_DIR_TO_WATCH = os.path.join(os.path.dirname(__file__), ".")  
+DRIVE_FOLDER_ID = "1eT3I5RGrzFJRERu72Lw-N6YjeNgyzUD2" 
+CREDENTIALS_FILE = '../../config/credentials.json'
+TOKEN_FILE = '../../config/token.json'
 
-CREDENTIALS_FILE = 'credentials.json' # Downloaded from Google Cloud Console
-TOKEN_FILE = 'token.json' # Will be created after first authentication
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')

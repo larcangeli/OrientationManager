@@ -5,7 +5,7 @@ from bleak import BleakClient, BleakScanner
 import requests
 
 # Server configuration
-FLASK_SERVER_URL = "http://127.0.0.1:5000/alert"
+FLASK_SERVER_URL = os.getenv('FLASK_SERVER_URL', "http://127.0.0.1:5000/alert")
 
 # Define UUIDs - must match those in your Arduino sketch
 ORIENTATION_SERVICE_UUID = "19B10000-E8F2-537E-4F6C-D104768A1214"
