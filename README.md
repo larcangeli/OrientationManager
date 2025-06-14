@@ -30,36 +30,53 @@ OrientationManager helps students maintain proper posture during study sessions 
         │ Sends via Bluetooth          │ Uploads to Drive              │ Chat Interface
         └─────────────────────────────────────────────────────────────────────────┘
 ```
+---
 
-## 🔧 Components
+## 🏗️ Repository Structure
 
-### 1. Hardware (Arduino/C++)
-- **File**: `src/main.cpp`
-- **Hardware**: NICLA Sense ME with BHY2 sensors
-- **Features**:
-  - Quaternion to Euler angle conversion
-  - Real-time posture threshold monitoring
-  - Bluetooth Low Energy (BLE) data transmission
-  - LED status indicators
+```
+OrientationManager/
+├── config/                # Python requirements and configuration files
+│   └── requirements.txt
+├── dataCollection/        # Python BLE data collection & logging
+│   └── src/
+├── hardware/              # Arduino/C++ firmware for NICLA Sense ME
+│   ├── src/
+│   ├── include/
+│   └── platformio.ini
+├── lib/                   # Additional libraries (see README inside)
+├── test/                  # Test scripts and utilities (see README inside)
+├── webApp/                # Web application (backend & frontend)
+│   ├── backend/           # Python Flask backend API
+│   └── frontend/          # React+Vite dashboard and chat interface
+├── .gitignore
+└── README.md
+```
 
-### 2. Data Collection (Python)
-- **Files**: `src/ble_receiver.py`, `src/auto_upload_csv.py`
-- **Features**:
-  - BLE connection and data reception
-  - CSV data logging with timestamps
-  - Automatic Google Drive upload
-  - Real-time alert forwarding to Flask server
+---
 
-### 3. Web Application
-- **Backend**: Flask (`flaskapp/app.py`)
-  - Google Gemini AI integration
-  - RESTful API endpoints
-  - Real-time alert management
-  - Google Drive data analysis
-- **Frontend**: React (`flaskapp/frontend/`)
-  - Interactive chat with PosturAI
-  - Statistics dashboard with visualizations
-  - Real-time alert notifications
+## 🧩 Components
+
+### 1. Hardware (`hardware/`)
+- **Language**: C++ (Arduino/PlatformIO)
+- **Device**: NICLA Sense ME
+- **Function**: Collects IMU (BHY2) sensor data, detects poor posture, sends alerts via BLE.
+
+### 2. Data Collection (`dataCollection/`)
+- **Language**: Python
+- **Function**: Receives BLE data, logs to CSV, uploads to Google Drive, forwards alerts to backend.
+
+### 3. Web Application (`webApp/`)
+- **Backend**: Flask API (`webApp/backend/`)
+  - Receives and manages alerts, connects with Google Gemini for AI analysis, handles REST API.
+- **Frontend**: React+Vite (`webApp/frontend/`)
+  - Posture dashboard, statistics, real-time alerts, AI chat (PosturAI).
+
+### 4. Libraries & Tests
+- **lib/**: Custom or external libraries for hardware/software.
+- **test/**: Scripts for testing BLE, LLM integration, data pipeline, etc.
+
+---
 
 ## 🚀 Quick Start
 
@@ -67,15 +84,14 @@ OrientationManager helps students maintain proper posture during study sessions 
 - NICLA Sense ME board
 - Python 3.8+
 - Node.js 16+
-- Arduino IDE
+- Arduino IDE or PlatformIO
 - Google Drive API credentials
 
 ### 1. Hardware Setup
 ```bash
-# Flash the Arduino code to NICLA Sense ME
-# Open src/main.cpp in Arduino IDE
+# Open hardware/src/ in Arduino IDE or PlatformIO
 # Select "Arduino Nicla Sense ME" board
-# Upload the sketch
+# Upload the firmware
 ```
 
 ### 2. Python Environment
@@ -95,149 +111,113 @@ pip install -r requirements.txt
 
 ### 3. Start Data Collection
 ```bash
-# Start BLE receiver
-python src/ble_receiver.py
+# Start BLE receiver (in dataCollection/)
+python dataCollection/src/ble_receiver.py
 
-# In another terminal, start Flask app
-cd flaskapp
-python app.py
+# (Optional) Start automatic CSV upload
+python dataCollection/src/auto_upload_csv.py
 ```
 
-### 4. Frontend Setup
+
+### 4. Start Web Application
 ```bash
-# Navigate to frontend directory
-cd flaskapp/frontend
+# Backend (Flask)
+cd webApp/backend
+python app.py
 
-# Install dependencies
+# Frontend (React+Vite)
+cd ../frontend
 npm install
-
-# Start development server
 npm run dev
+
+# Open http://localhost:5173 in your browser
 ```
+
+---
 
 ## 📊 Usage
 
-1. **Wear the Device**: Attach NICLA Sense ME to your head/neck area
-2. **Start Monitoring**: Run the Python BLE receiver
-3. **Access Dashboard**: Open `http://localhost:5000` in your browser
-4. **Chat with AI**: Ask PosturAI questions about your posture
-5. **View Statistics**: Monitor your posture trends over time
+1. **Wear the Device**: Attach NICLA Sense ME to your head/neck area.
+2. **Start Monitoring**: Run the Python BLE receiver.
+3. **Access Dashboard**: Open the web dashboard.
+4. **Chat with AI**: Ask PosturAI questions about your posture.
+5. **View Statistics**: Monitor your posture trends over time.
 
-## 🔑 Configuration
+---
+
+## 🔧 Configuration
 
 ### Environment Variables
+Set these as local environment variables or in a `.env` file:
 ```bash
-# Google Drive folder ID for CSV storage
 GOOGLE_DRIVE_CSV_FOLDER_ID="your_folder_id_here"
-
-# Flask server URL for alerts
 FLASK_SERVER_URL="http://127.0.0.1:5000/alert"
 ```
 
 ### Posture Thresholds
-Modify thresholds in `src/main.cpp`:
+Adjust in `hardware/src/main.cpp`:
 ```cpp
 const float ALERT_THRESHOLD = 5.0; // degrees
 ```
 
+---
+
 ## 📈 Features
 
-### Real-time Monitoring
-- Continuous IMU data collection (pitch, roll, yaw)
-- Configurable posture thresholds
-- Instant visual and audio alerts
+- Real-time IMU monitoring (pitch, roll, yaw)
+- Configurable posture thresholds and alerts
+- BLE data collection and cloud upload
+- AI-driven posture analysis (Google Gemini)
+- Web dashboard (React+Vite) with statistics, notifications, and chat
 
-### AI-Powered Insights
-- Personalized posture recommendations
-- Conversational interface with PosturAI
-- Pattern analysis and trend identification
+---
 
-### Data Management
-- Automatic CSV generation with timestamps
-- Google Drive cloud storage
-- Long-term posture history tracking
+## ⚙️ Development
 
-### Web Dashboard
-- Interactive statistics and graphs
-- Real-time alert notifications
-- Multi-user support ready
+- See `lib/README` and `test/README` for library and testing details
+- Contribute via feature branches & pull requests
 
-## 🛠️ Development
-
-### Project Structure
-```
-OrientationManager/
-├── src/                    # Arduino and Python source code
-│   ├── main.cpp           # Arduino firmware
-│   ├── ble_receiver.py    # BLE data collection
-│   └── auto_upload_csv.py # Google Drive integration
-├── flaskapp/              # Web application
-│   ├── app.py            # Flask backend
-│   ├── frontend/         # React frontend
-│   └── templates/        # HTML templates
-├── docs/                 # Documentation
-├── examples/             # Usage examples
-└── tests/               # Unit tests
-```
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+---
 
 ## 📋 Requirements
 
 ### Hardware
 - NICLA Sense ME board
-- USB-C cable for programming
-- Optional: 3D printed mounting case
+- USB-C cable
+- Optional: 3D printed mount
 
 ### Software
 - Python 3.8+
 - Node.js 16+
-- Arduino IDE 2.0+
+- Arduino IDE 2.0+ or PlatformIO
 
-### Python Dependencies
-```
-flask
-flask-cors
-bleak
-google-api-python-client
-google-auth-oauthlib
-google-generativeai
-watchdog
-requests
-```
-
-### Frontend Dependencies
-```
-react
-vite
-@vitejs/plugin-react
-```
+---
 
 ## 🔒 Security & Privacy
 
-- All data is stored locally and in your personal Google Drive
+- All data is stored locally and/or your Google Drive
 - No third-party data sharing
-- Google Gemini AI calls are made only when explicitly requested
-- BLE communication is device-specific and secure
+- Secure BLE communication
 
-## 📜 License
+---
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+---
+
 ## 🤝 Support
 
-- **Issues**: Report bugs and request features via [GitHub Issues](https://github.com/larcangeli/OrientationManager/issues)
-- **Discussions**: Join the conversation in [GitHub Discussions](https://github.com/larcangeli/OrientationManager/discussions)
-- **Wiki**: Check the [Wiki](https://github.com/larcangeli/OrientationManager/wiki) for detailed documentation
+- **Issues**: [GitHub Issues](https://github.com/larcangeli/OrientationManager/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/larcangeli/OrientationManager/discussions)
+- **Wiki**: [Wiki](https://github.com/larcangeli/OrientationManager/wiki)
+
+---
 
 ## 🎓 Academic Use
 
-This project was developed as part of a student health and wellness initiative. If you use this project in academic research, please cite:
+If you use this in research, please cite:
 
 ```bibtex
 @software{OrientationManager2025,
@@ -247,7 +227,3 @@ This project was developed as part of a student health and wellness initiative. 
   url = {https://github.com/larcangeli/OrientationManager}
 }
 ```
-
----
-
-**Made with ❤️ for student health and wellness**
