@@ -52,7 +52,7 @@ OrientationManager/
 ├── .gitignore
 └── README.md
 ```
-
+---
 ## 🧩 Components
 
 ### 1. Hardware (`hardware/`)
@@ -74,7 +74,7 @@ OrientationManager/
 - **lib/**: Custom or external libraries for hardware/software.
 - **test/**: Scripts for testing BLE, LLM integration, data pipeline, etc.
 
-
+---
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -130,7 +130,7 @@ npm run dev
 # Open http://localhost:5173 in your browser
 ```
 
-
+---
 ## 📊 Usage
 
 1. **Wear the Device**: Attach NICLA Sense ME to your head/neck area.
@@ -155,7 +155,7 @@ Adjust in `hardware/src/main.cpp`:
 ```cpp
 const float ALERT_THRESHOLD = 5.0; // degrees
 ```
-
+---
 
 ## 📈 Features
 
@@ -172,7 +172,7 @@ const float ALERT_THRESHOLD = 5.0; // degrees
 - See `lib/README` and `test/README` for library and testing details
 - Contribute via feature branches & pull requests
 
-
+---
 ## 📋 Requirements
 
 ### Hardware
@@ -184,7 +184,7 @@ const float ALERT_THRESHOLD = 5.0; // degrees
 - Python 3.8+
 - Node.js 16+
 - Arduino IDE 2.0+ or PlatformIO
-
+---
 
 ## 🔒 Security & Privacy
 
@@ -192,19 +192,19 @@ const float ALERT_THRESHOLD = 5.0; // degrees
 - No third-party data sharing
 - Secure BLE communication
 
-
+---
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-
+---
 ## 🤝 Support
 
 - **Issues**: [GitHub Issues](https://github.com/larcangeli/OrientationManager/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/larcangeli/OrientationManager/discussions)
 - **Wiki**: [Wiki](https://github.com/larcangeli/OrientationManager/wiki)
 
-
+---
 ## 🎓 Academic Use
 
 If you use this in research, please cite:
