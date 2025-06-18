@@ -31,10 +31,8 @@ API_KEY_FILE_PATH = "../../config/google_API_key.txt"
 GOOGLE_API_KEY = None
 try:
     with open(API_KEY_FILE_PATH, 'r') as f:
-        # Leggi la chiave, rimuovendo eventuali spazi bianchi o a capo
-        # Se hai più chiavi nel file, dovrai gestirlo diversamente
         raw_key = f.read().strip()
-        if raw_key: #file not empty
+        if raw_key:
             GOOGLE_API_KEY = raw_key
         else:
             print(f"ATTENZIONE: Il file della API key '{API_KEY_FILE_PATH}' è vuoto.")
@@ -51,29 +49,89 @@ else:
     print("ATTENZIONE: La variabile d'ambiente GOOGLE_API_KEY non è impostata.")
     model_gemini = None 
 
-
 # Configuration for background task
 DRIVE_FETCH_INTERVAL_SECONDS = 20 
 background_thread_stop_event = threading.Event() 
 
-# Funzione placeholder, da sostituire con la tua vera analisi CSV
+# Topic-specific prompt templates
+TOPIC_PROMPTS = {
+    'analysis': """You are PosturAI, analyzing the user's posture data. Focus on:
+    - Current posture patterns and trends
+    - Specific problem areas identified from the data
+    - Time periods when posture is worst/best
+    - Measurable improvements or concerns
+    Keep responses data-driven and specific.""",
+    
+    'tips': """You are PosturAI, providing practical posture improvement advice. Focus on:
+    - Actionable, specific tips based on the user's data
+    - Easy-to-implement daily habits
+    - Prioritized recommendations (most important first)
+    - Quick fixes for immediate improvement
+    Keep advice practical and encouraging.""",
+    
+    'exercises': """You are PosturAI, recommending specific exercises. Focus on:
+    - Targeted exercises for the user's specific posture issues
+    - Simple desk exercises that can be done during work
+    - Stretches and strengthening exercises
+    - Frequency and duration recommendations
+    Provide clear, step-by-step instructions.""",
+    
+    'workspace': """You are PosturAI, helping optimize workspace ergonomics. Focus on:
+    - Desk height, monitor position, chair adjustment
+    - Keyboard and mouse positioning
+    - Lighting and screen setup
+    - Equipment recommendations if needed
+    Give specific measurements and setup instructions.""",
+    
+    'breaks': """You are PosturAI, advising on effective break strategies. Focus on:
+    - Optimal break frequency based on user's patterns
+    - Specific activities to do during breaks
+    - Movement and stretching routines
+    - How to make breaks more effective for posture
+    Provide practical break schedules and activities.""",
+    
+    'progress': """You are PosturAI, helping track posture improvement. Focus on:
+    - Comparing current data to previous periods
+    - Identifying positive trends and areas of concern
+    - Setting realistic improvement goals
+    - Celebrating achievements and addressing setbacks
+    Be encouraging while staying realistic about progress."""
+}
+
 def get_posture_summary_for_llm(user_id="default_user"):
-    # QUI VA LA LOGICA DI LETTURA E ANALISI CSV
-    # Esempio:
-    # posture_data_summary = posture_analyzer.summarize_csv_data_for_user(user_id, days_to_analyze=7)
-    # return posture_data_summary
-    return """Analisi posturale per l'utente StudenteX dal 20/05/2025 al 26/05/2025:
-    - Tempo totale di monitoraggio: 25 ore.
-    - Inclinazione eccessiva in avanti (pitch > 20°): rilevata per il 60% del tempo, principalmente nelle ore pomeridiane (14:00-18:00) durante le sessioni di studio.
-    - Inclinazione laterale a sinistra (roll < -15°): rilevata per il 15% del tempo, spesso quando l'utente scrive o usa il mouse.
-    - Rispetto alla settimana precedente, l'inclinazione in avanti è leggermente aumentata."""
+    # Enhanced mock data for better AI responses
+    return """Posture Analysis Summary for Student (June 18, 2025):
+    
+    Current Session Data:
+    - Total monitoring time today: 4.2 hours
+    - Good posture maintained: 78% of time (3.3 hours)
+    - Poor posture detected: 22% of time (52 minutes)
+    - Total alerts generated: 12
+    
+    Primary Issues Detected:
+    - Forward head posture: 60% of poor posture time (mainly 2-6 PM)
+    - Left shoulder drop: 25% of poor posture time
+    - Excessive forward lean: 15% of poor posture time
+    
+    Patterns Observed:
+    - Posture deteriorates significantly after 2 hours of continuous work
+    - Worst posture period: 3:00-4:00 PM (likely afternoon fatigue)
+    - Best posture: Morning sessions (9-11 AM)
+    
+    Weekly Trends:
+    - 15% improvement in good posture time vs last week
+    - 30% reduction in severe forward head posture incidents
+    - Consistent improvement in break-taking behavior
+    
+    Workspace Notes:
+    - Frequent mouse-heavy tasks correlate with right shoulder tension
+    - Extended reading periods show increased forward lean"""
 
-
-# --- Google Drive Fetching Logic (moved to a function) ---
+# Background task functions (keeping existing functionality)
 def perform_drive_csv_fetch():
     """Fetches CSVs from Google Drive and saves them locally."""
     logger.info("Background task: Starting CSV fetch from Google Drive.")
-    drive_service = drive_utils.get_drive_service() # This might trigger auth flow on first run if token.json is missing/invalid
+    drive_service = drive_utils.get_drive_service()
     if not drive_service:
         logger.error("Background task: Failed to get Google Drive service. Cannot fetch files.")
         return {"status": "error", "message": "Failed to authenticate with Google Drive."}
@@ -117,38 +175,32 @@ def perform_drive_csv_fetch():
         "downloaded_file_names": downloaded_file_names
     }
 
-# --- Background Task Runner ---
 def background_drive_fetcher():
     """Periodically calls the drive fetching logic."""
     logger.info("Background Drive Fetcher thread started.")
-    # Perform an initial fetch shortly after startup (optional, give server time to fully start)
-    time.sleep(10) # Wait a few seconds before first fetch
+    time.sleep(10)
     if not background_thread_stop_event.is_set():
         perform_drive_csv_fetch()
 
     while not background_thread_stop_event.is_set():
         logger.debug(f"Background Drive Fetcher sleeping for {DRIVE_FETCH_INTERVAL_SECONDS} seconds.")
-        # Wait for the interval or until the stop event is set
-        # Using wait() allows the thread to exit quickly if the event is set
         background_thread_stop_event.wait(DRIVE_FETCH_INTERVAL_SECONDS)
-        if not background_thread_stop_event.is_set(): # Check again after waking up
+        if not background_thread_stop_event.is_set():
             perform_drive_csv_fetch()
     logger.info("Background Drive Fetcher thread stopped.")
 
 def generate_mock_posture_data(days):
-    """
-    Generate mock data for testing. Replace this with real CSV analysis.
-    """
+    """Generate mock data for testing. Replace this with real CSV analysis."""
     daily_data = []
     total_alerts = 0
     total_hours = 0
     
     for i in range(days):
         date = (datetime.now() - timedelta(days=days-i-1)).strftime('%m/%d')
-        good_posture = 60 + (i * 2) + (i % 3) * 10  # Varies between 60-90%
+        good_posture = 60 + (i * 2) + (i % 3) * 10
         poor_posture = 100 - good_posture
-        alert_count = 5 + (i % 4) * 3  # Varies between 5-17 alerts
-        hours = 4 + (i % 3) * 1.5  # Varies between 4-7 hours
+        alert_count = 5 + (i % 4) * 3
+        hours = 4 + (i % 3) * 1.5
         
         daily_data.append({
             'date': date,
@@ -164,8 +216,8 @@ def generate_mock_posture_data(days):
     summary = {
         'total_hours': round(total_hours, 1),
         'good_posture_percentage': round(sum(d['good_posture_percentage'] for d in daily_data) / len(daily_data), 1),
-        'forward_lean_percentage': 25,  # Mock data
-        'side_tilt_percentage': 15,     # Mock data
+        'forward_lean_percentage': 25,
+        'side_tilt_percentage': 15,
         'total_alerts': total_alerts
     }
     
@@ -174,34 +226,9 @@ def generate_mock_posture_data(days):
         'summary': summary
     }
 
-def analyze_csv_data_for_stats(days=7):
-    """
-    Analyze actual CSV files from your posture data.
-    This function should be implemented to read your CSV files and calculate real statistics.
-    """
-    # TODO: Implement real CSV analysis
-    # 1. Read CSV files from LOCAL_DOWNLOAD_DIR
-    # 2. Filter data for the last 'days' days
-    # 3. Calculate posture statistics (pitch/roll thresholds)
-    # 4. Count alerts and monitoring time
-    # 5. Return structured data for frontend
-    
-    csv_files = glob.glob(os.path.join(LOCAL_DOWNLOAD_DIR, "*.csv"))
-    
-    # Example structure for real implementation:
-    # for csv_file in csv_files:
-    #     df = pd.read_csv(csv_file)
-    #     # Analyze pitch, roll, yaw data
-    #     # Calculate time periods with good vs poor posture
-    #     # Count alerts based on your thresholds
-    
-    pass
-
-
-# --- Flask Routes (Alerts, Dashboard, etc. remain the same) ---
+# --- Flask Routes ---
 @app.route('/alert', methods=['POST'])
 def receive_alert_post():
-    # ... (same as before) ...
     global received_alerts
     if request.method == 'POST':
         try:
@@ -218,99 +245,68 @@ def receive_alert_post():
             logger.error(f"Error processing /alert POST request: {e}", exc_info=True)
             return jsonify({"status": "error", "message": str(e)}), 500
 
-'''
-@app.route('/', methods=['GET'])
-def dashboard_page():
-    logger.info("Dashboard page requested.")
-    return render_template('dashboard.html')
-
-@app.route('/')
-def index():
-    return render_template('chat_interface.html')
-'''
-
 @app.route('/get_alerts_data', methods=['GET'])
 def get_alerts_data_json():
     alerts_list = list(received_alerts)
     return jsonify({"alerts": alerts_list})
 
-# Optional: Manual trigger endpoint (can be removed if only background task is desired)
 @app.route('/fetch_drive_csvs_manual', methods=['GET'])
 def fetch_drive_csvs_route_manual():
     logger.info("Manual request received to fetch CSVs from Google Drive.")
-    result = perform_drive_csv_fetch() # Call the refactored function
+    result = perform_drive_csv_fetch()
     return jsonify(result), 200 if result.get("status") == "success" else 500
 
 @app.route('/chat_ai', methods=['POST'])
 def chat_ai_endpoint():
     data = request.get_json()
     user_question = data.get('question')
+    topic_id = data.get('topic', 'general')
+    topic_context = data.get('context', '')
 
     if not user_question:
-        return jsonify({"error": "Domanda non fornita"}), 400
+        return jsonify({"error": "Question not provided"}), 400
 
-    # 1. Ottieni il riassunto dei dati posturali
-    posture_context = get_posture_summary_for_llm() # In futuro, passerai un user_id
+    # Get posture data summary
+    posture_context = get_posture_summary_for_llm()
 
-    # 2. Costruisci il Prompt per l'LLM
-    system_prompt = """Tu sei PosturAI, un consulente AI amichevole e esperto di ergonomia, specializzato nell'aiutare gli studenti a migliorare la loro postura.
-    Il tuo obiettivo è analizzare i dati posturali forniti, rispondere alle domande degli studenti, offrire consigli pratici e incoraggianti.
-    Non fornire diagnosi mediche. Concentrati su abitudini, esercizi semplici e setup della postazione di studio.
-    Sii conciso ma informativo."""
+    # Get topic-specific system prompt
+    system_prompt = TOPIC_PROMPTS.get(topic_id, TOPIC_PROMPTS['tips'])
 
-    # Prompt per l'utente (combinando contesto e domanda)
-    # Per Gemini (che preferisce un formato di prompt più diretto o una storia di chat)
-    # Puoi anche usare una struttura di chat con turni 'user' e 'model' se l'API lo supporta meglio
-    full_prompt = f"""Contesto dei dati posturali dello studente:
-    {posture_context}
+    # Enhanced prompt with topic context
+    full_prompt = f"""{system_prompt}
 
-    Domanda dello studente:
-    {user_question}
+User's Current Posture Data:
+{posture_context}
 
-    Tua risposta come PosturAI:"""
+Topic Context: {topic_context}
 
-    # 3. Chiama l'API dell'LLM
+User's Question: {user_question}
+
+Provide a helpful, specific response as PosturAI focusing on this topic. Be encouraging but realistic, and base your advice on the provided posture data when possible."""
+
     try:
-        # Esempio con Google Gemini
-        response = model_gemini.generate_content(full_prompt)
-        ai_reply = response.text
-
-        # Esempio con OpenAI (se si usa client_openai)
-        # chat_completion = client_openai.chat.completions.create(
-        #     messages=[
-        #         {"role": "system", "content": system_prompt},
-        #         {"role": "user", "content": f"Contesto: {posture_context}\n\nDomanda: {user_question}"}
-        #     ],
-        #     model="gpt-3.5-turbo",
-        # )
-        # ai_reply = chat_completion.choices[0].message.content
+        if model_gemini:
+            response = model_gemini.generate_content(full_prompt)
+            ai_reply = response.text
+        else:
+            ai_reply = f"I'd love to help with {topic_id}, but I'm having trouble connecting to my AI services right now. Please try again later!"
 
     except Exception as e:
-        print(f"Errore durante la chiamata all'LLM: {e}")
-        ai_reply = "Scusa, sto avendo qualche difficoltà a elaborare la tua richiesta in questo momento. Riprova più tardi."
+        logger.error(f"Error during LLM call: {e}")
+        ai_reply = "I'm having some difficulty processing your request right now. Please try again in a moment."
 
     return jsonify({"reply": ai_reply})
 
-
 @app.route('/api/posture-stats')
 def get_posture_statistics():
-    """
-    API endpoint to get posture statistics for the frontend graphs
-    """
+    """API endpoint to get posture statistics for the frontend graphs"""
     try:
         days = int(request.args.get('days', 7))
-        
-        # This is where you'll implement your CSV analysis logic
-        # For now, returning mock data structure
         mock_data = generate_mock_posture_data(days)
-        
         return jsonify(mock_data)
-    
     except Exception as e:
-        print(f"Error getting posture statistics: {e}")
+        logger.error(f"Error getting posture statistics: {e}")
         return jsonify({"error": "Failed to fetch statistics"}), 500
-
-
 
 # --- Main Execution ---
 if __name__ == '__main__':
@@ -318,10 +314,6 @@ if __name__ == '__main__':
     os.makedirs(LOCAL_DOWNLOAD_DIR, exist_ok=True)
     logger.info(f"CSV files from Drive will be saved to: {os.path.abspath(LOCAL_DOWNLOAD_DIR)}")
 
-    # Start the background thread for fetching Drive files
-    # Make sure the initial Google Auth can happen if needed.
-    # The first call to get_drive_service() might block for user input (OAuth).
-    # If running headless, ensure token.json is pre-generated or run_console is used.
     logger.info("Attempting to initialize Google Drive service for background thread setup...")
     drive_service_init = drive_utils.get_drive_service()
     if drive_service_init:
@@ -329,22 +321,15 @@ if __name__ == '__main__':
         fetcher_thread = threading.Thread(target=background_drive_fetcher, daemon=True)
         fetcher_thread.start()
     else:
-        logger.error("Failed to initialize Google Drive service. Background fetcher NOT started. Manual fetch might still work if auth succeeds later.")
-        # You might want to decide if the app should exit or continue without the background task.
+        logger.error("Failed to initialize Google Drive service. Background fetcher NOT started.")
 
     try:
-        # Note: When using Flask's development server with debug=True and auto-reloading,
-        # the background thread might be started twice or behave unexpectedly on reloads.
-        # For production, you'd use a proper WSGI server (Gunicorn, uWSGI) which handles
-        # processes differently.
         app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False if drive_service_init else True)
-        # use_reloader=False can help with threads in dev, but you lose auto-reload on code change.
-        # If `drive_service_init` fails, reloader might be fine.
     except KeyboardInterrupt:
         logger.info("Flask server shutting down...")
     finally:
         logger.info("Signaling background thread to stop...")
         background_thread_stop_event.set()
         if 'fetcher_thread' in locals() and fetcher_thread.is_alive():
-            fetcher_thread.join(timeout=5) # Wait for the thread to finish
+            fetcher_thread.join(timeout=5)
         logger.info("Flask application terminated.")

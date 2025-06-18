@@ -29,9 +29,12 @@ Thumbs.db
 config/token.json
 config/credentials.json 
 config/google_API_key.txt
+config/activate_venv.bat
 
 # csv files
 webApp/backend/downloaded_csvs
+webApp/__pycache__
+webApp/backend/__pycache__
 
 
 # ... other OS specific files etc ...

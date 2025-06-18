@@ -3,6 +3,7 @@ import csv
 from datetime import datetime
 from bleak import BleakClient, BleakScanner
 import requests
+import os
 
 # Server configuration
 FLASK_SERVER_URL = os.getenv('FLASK_SERVER_URL', "http://127.0.0.1:5000/alert")
