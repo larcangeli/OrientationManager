@@ -29,7 +29,7 @@ Thumbs.db
 config/token.json
 config/credentials.json 
 config/google_API_key.txt
-config/activate_venv.bat
+config/PostureTracker_launch.bat
 
 # csv files
 webApp/backend/downloaded_csvs
