@@ -1,4 +1,4 @@
-# 🏃‍♂️ OrientationManager - Student Posture Monitoring System
+# 🏃‍♂️ PostureTracker - Student Posture Monitoring System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
@@ -9,7 +9,7 @@ A comprehensive posture monitoring system designed for students using **NICLA Se
 
 ## 🎯 Overview
 
-OrientationManager helps students maintain proper posture during study sessions by:
+PostureTracker helps students maintain proper posture during study sessions by:
 - **Real-time monitoring** of head and neck orientation using IMU sensors
 - **Instant alerts** when poor posture is detected
 - **AI-powered analysis** using Google Gemini for personalized recommendations
@@ -35,7 +35,7 @@ OrientationManager helps students maintain proper posture during study sessions 
 ## 🏗️ Repository Structure
 
 ```
-OrientationManager/
+PostureTracker/
 ├── config/                # Python requirements and configuration files
 │   └── requirements.txt
 ├── dataCollection/        # Python BLE data collection & logging
@@ -94,8 +94,8 @@ OrientationManager/
 ### 2. Python Environment
 ```bash
 # Clone the repository
-git clone https://github.com/larcangeli/OrientationManager.git
-cd OrientationManager
+git clone https://github.com/larcangeli/PostureTracker.git
+cd PostureTracker
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -200,9 +200,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 ## 🤝 Support
 
-- **Issues**: [GitHub Issues](https://github.com/larcangeli/OrientationManager/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/larcangeli/OrientationManager/discussions)
-- **Wiki**: [Wiki](https://github.com/larcangeli/OrientationManager/wiki)
+- **Issues**: [GitHub Issues](https://github.com/larcangeli/PostureTracker/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/larcangeli/PostureTracker/discussions)
+- **Wiki**: [Wiki](https://github.com/larcangeli/PostureTracker/wiki)
 
 ---
 ## 🎓 Academic Use
@@ -210,10 +210,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this in research, please cite:
 
 ```bibtex
-@software{OrientationManager2025,
+@software{PostureTracker2025,
   author = {larcangeli},
-  title = {OrientationManager: Student Posture Monitoring System},
+  title = {PostureTracker: Student Posture Monitoring System},
   year = {2025},
-  url = {https://github.com/larcangeli/OrientationManager}
+  url = {https://github.com/larcangeli/PostureTracker}
 }
 ```
