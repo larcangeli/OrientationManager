@@ -25,6 +25,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 
 
 def get_drive_service():
+    
     """Authenticates and returns the Google Drive API service client."""
     creds = None
     if os.path.exists(TOKEN_FILE):
