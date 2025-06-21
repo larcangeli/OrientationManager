@@ -29,11 +29,13 @@ body {
   background: rgba(52, 152, 219, 0.15); /* Light blue with transparency */
   backdrop-filter: blur(10px);
   color: #2c3e50;
-  padding: 1.5rem 2rem;
+  padding: 0.8rem 1rem;
   text-align: center;
   box-shadow: 0 4px 20px rgba(52, 152, 219, 0.1);
   flex-shrink: 0;
   border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+  min-height: 50px;
+  max-height: 100px;
 }
 
 .app-header-simple h1 {
@@ -348,7 +350,26 @@ body {
 
 /* Scrollbar Styling */
 .left-content-area::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+}
+
+.left-content-area::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.left-content-area::-webkit-scrollbar-thumb {
+  background: rgba(52, 152, 219, 0.3);
+}
+
+.left-content-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2980b9 0%, #1f5582 100%);
+}
+
+/* Topic selection scrollbar */
+.left-content-area::-webkit-scrollbar {
+  width: 8px;
 }
 
 .left-content-area::-webkit-scrollbar-track {
@@ -357,7 +378,7 @@ body {
 
 .left-content-area::-webkit-scrollbar-thumb {
   background: rgba(52, 152, 219, 0.3);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .left-content-area::-webkit-scrollbar-thumb:hover {

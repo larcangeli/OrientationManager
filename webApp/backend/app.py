@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
 import datetime
 import os
-from flask_cors import CORS # For handling CORS if needed
+from flask_cors import CORS
 import google.generativeai as genai
-import time # For sleeping in the background thread
-import threading # For background tasks
+import time 
+import threading
 from collections import deque
 import logging
 import json
@@ -12,13 +12,13 @@ import pandas as pd
 from datetime import datetime, timedelta
 import glob
 import sys
-import google_drive_utils as drive_utils # Your Google Drive utility module
+import google_drive_utils as drive_utils
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes (optional, adjust as needed)
+CORS(app)
 
 # --- Configuration ---
 GOOGLE_DRIVE_CSV_FOLDER_ID = "1eT3I5RGrzFJRERu72Lw-N6YjeNgyzUD2"
@@ -99,7 +99,6 @@ TOPIC_PROMPTS = {
 }
 
 def get_posture_summary_for_llm(user_id="default_user"):
-    # Enhanced mock data for better AI responses
     return """Posture Analysis Summary for Student (June 18, 2025):
     
     Current Session Data:
@@ -126,17 +125,18 @@ def get_posture_summary_for_llm(user_id="default_user"):
     Workspace Notes:
     - Frequent mouse-heavy tasks correlate with right shoulder tension
     - Extended reading periods show increased forward lean"""
-
-# Background task functions (keeping existing functionality)
+ 
 def perform_drive_csv_fetch():
+    
     """Fetches CSVs from Google Drive and saves them locally."""
+    
     logger.info("Background task: Starting CSV fetch from Google Drive.")
     drive_service = drive_utils.get_drive_service()
     if not drive_service:
         logger.error("Background task: Failed to get Google Drive service. Cannot fetch files.")
         return {"status": "error", "message": "Failed to authenticate with Google Drive."}
 
-    if not GOOGLE_DRIVE_CSV_FOLDER_ID or GOOGLE_DRIVE_CSV_FOLDER_ID == "YOUR_GOOGLE_DRIVE_FOLDER_ID_CONTAINING_CSVS":
+    if not GOOGLE_DRIVE_CSV_FOLDER_ID:
         logger.error("Background task: GOOGLE_DRIVE_CSV_FOLDER_ID is not configured.")
         return {"status": "error", "message": "Google Drive folder ID not configured on server."}
 
@@ -176,7 +176,9 @@ def perform_drive_csv_fetch():
     }
 
 def background_drive_fetcher():
+    
     """Periodically calls the drive fetching logic."""
+    
     logger.info("Background Drive Fetcher thread started.")
     time.sleep(10)
     if not background_thread_stop_event.is_set():
@@ -190,7 +192,9 @@ def background_drive_fetcher():
     logger.info("Background Drive Fetcher thread stopped.")
 
 def generate_mock_posture_data(days):
-    """Generate mock data for testing. Replace this with real CSV analysis."""
+    
+    """Generate mock data for the demo. Needs replacement with real CSV analysis."""
+    
     daily_data = []
     total_alerts = 0
     total_hours = 0
@@ -226,7 +230,10 @@ def generate_mock_posture_data(days):
         'summary': summary
     }
 
-# --- Flask Routes ---
+
+
+
+#______________________FLASK ROUTES_________________________________
 @app.route('/alert', methods=['POST'])
 def receive_alert_post():
     global received_alerts
@@ -273,16 +280,16 @@ def chat_ai_endpoint():
     system_prompt = TOPIC_PROMPTS.get(topic_id, TOPIC_PROMPTS['tips'])
 
     # Enhanced prompt with topic context
-    full_prompt = f"""{system_prompt}
+    full_prompt = f"""  {system_prompt}
 
-User's Current Posture Data:
-{posture_context}
+                        User's Current Posture Data:
+                        {posture_context}
 
-Topic Context: {topic_context}
+                        Topic Context: {topic_context}
 
-User's Question: {user_question}
+                        User's Question: {user_question}
 
-Provide a helpful, specific response as PosturAI focusing on this topic. Be encouraging but realistic, and base your advice on the provided posture data when possible."""
+                        Provide a helpful, specific response as PosturAI focusing on this topic. Be encouraging but realistic, and base your advice on the provided posture data when possible."""
 
     try:
         if model_gemini:
@@ -308,7 +315,7 @@ def get_posture_statistics():
         logger.error(f"Error getting posture statistics: {e}")
         return jsonify({"error": "Failed to fetch statistics"}), 500
 
-# --- Main Execution ---
+
 if __name__ == '__main__':
     logger.info("Flask Alert Server Starting with Google Drive integration...")
     os.makedirs(LOCAL_DOWNLOAD_DIR, exist_ok=True)

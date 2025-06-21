@@ -28,14 +28,14 @@ function App() {
   return (
     <div className="page-wrapper-with-background">
       <header className="app-header-simple">
-        <h1>🎯 Posture Manager</h1>
+        <h1>Posture Manager</h1>
         <p className="header-subtitle">AI-Powered Posture Monitoring & Improvement</p>
       </header>
 
       <div className="main-layout-container">
         <aside className="left-content-area">
           <div className="user-welcome">
-            <h2>👋 Welcome back!</h2>
+            <h2> Welcome back 👋</h2>
             <p>Track your posture journey</p>
           </div>
           

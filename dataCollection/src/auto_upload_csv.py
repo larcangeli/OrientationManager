@@ -19,29 +19,23 @@ CREDENTIALS_FILE = '../../config/credentials.json'
 TOKEN_FILE = '../../config/token.json'
 
 
-# Setup basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
-# --- GOOGLE DRIVE AUTHENTICATION ---
+
 def get_drive_service():
-    """Shows basic usage of the Drive v3 API.
-    Prints the names and ids of the first 10 files the user has access to.
-    """
+    """Google drive authentication and service creation."""
+    
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
+    
     if os.path.exists(TOKEN_FILE):
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 CREDENTIALS_FILE, SCOPES)
-            creds = flow.run_local_server(port=0) # Will open a browser for auth
-        # Save the credentials for the next run
+            creds = flow.run_local_server(port=0) 
         with open(TOKEN_FILE, 'w') as token:
             token.write(creds.to_json())
 
@@ -52,9 +46,10 @@ def get_drive_service():
         logging.error(f'An error occurred building the Drive service: {error}')
         return None
 
-# --- GOOGLE DRIVE UPLOAD ---
+
 def upload_file_to_drive(service, filepath, drive_folder_id):
     """Uploads a file to the specified Google Drive folder."""
+    
     file_metadata = {
         'name': os.path.basename(filepath)
     }
@@ -80,7 +75,7 @@ class CSVHandler(FileSystemEventHandler):
     def __init__(self, drive_service, drive_folder_id):
         self.drive_service = drive_service
         self.drive_folder_id = drive_folder_id
-        self.processed_files = {} # To avoid processing a file multiple times for rapid events
+        self.processed_files = {}
 
     def on_created(self, event):
         if not event.is_directory and event.src_path.lower().endswith(".csv"):
@@ -88,26 +83,20 @@ class CSVHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not event.is_directory and event.src_path.lower().endswith(".csv"):
-            # Some editors trigger 'modified' multiple times quickly when saving.
-            # We'll add a small delay and check if it's a genuine new save.
             self._process_file(event.src_path, "modified")
 
     def _process_file(self, filepath, event_type):
-        # Debounce: Check if this file was processed recently for the same event type
-        # This is a simple debounce. More sophisticated logic might be needed for complex save patterns.
+        
         current_time = time.time()
         last_processed_time = self.processed_files.get(filepath, 0)
 
-        # If file was created or modified very recently, give it a second to fully write
-        # and avoid processing multiple "modified" events for a single save action.
-        if current_time - last_processed_time < 2: # 2 second debounce window
+        if current_time - last_processed_time < 2: 
             return
 
         logging.info(f"CSV file {event_type}: {filepath}")
-        # Wait a tiny bit to ensure the file is fully written before uploading
         time.sleep(1)
         try:
-            if os.path.exists(filepath) and os.path.getsize(filepath) > 0: # Check if file exists and is not empty
+            if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
                 upload_file_to_drive(self.drive_service, filepath, self.drive_folder_id)
                 self.processed_files[filepath] = current_time
             else:
@@ -116,7 +105,6 @@ class CSVHandler(FileSystemEventHandler):
             logging.error(f"Error processing file {filepath}: {e}")
 
 
-# --- MAIN EXECUTION ---
 if __name__ == "__main__":
     if not os.path.exists(LOCAL_DIR_TO_WATCH):
         logging.error(f"Error: Local directory to watch does not exist: {LOCAL_DIR_TO_WATCH}")

@@ -39,11 +39,7 @@ def get_drive_service():
                 logger.error(f"{CREDENTIALS_FILE} not found. Cannot authenticate.")
                 return None
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-            # For a server-side app that might not have a browser readily available
-            # during initial setup, run_console() is often preferred over run_local_server().
-            # You'll copy a URL to a browser, authorize, and paste back a code.
-            # If run_local_server is problematic on your server:
-            # creds = flow.run_console()
+    
             try:
                 creds = flow.run_local_server(port=0) # Will open a browser for auth on first run
             except Exception as e:
@@ -114,16 +110,3 @@ def download_file(service, file_id, file_name, local_download_path):
     except Exception as e:
         logger.error(f"An unexpected error occurred during download of {file_id}: {e}")
         return False
-
-# Optional: function to delete a file from Drive (if you use drive.file scope)
-# def delete_drive_file(service, file_id):
-#     if not service:
-#         logger.error("Drive service is not available for deletion.")
-#         return False
-#     try:
-#         service.files().delete(fileId=file_id).execute()
-#         logger.info(f"File with ID: {file_id} deleted successfully from Google Drive.")
-#         return True
-#     except HttpError as error:
-#         logger.error(f"An error occurred deleting file {file_id} from Google Drive: {error}")
-#         return False
